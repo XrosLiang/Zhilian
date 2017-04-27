@@ -3,6 +3,7 @@ import requests
 from pyquery import PyQuery as pq
 from multiprocessing import Pool
 import time
+import random
 
 
 def get_page(url):
@@ -64,6 +65,20 @@ def save_to_mongo(content):
     else:
         print("***************\nFailed! {}\n***************".format(content["公司"]))
 
+def save_catrgory(content):
+    with open("catrgory.txt", "a") as f:
+        f.write(content)
+        print("职位类别已录入...")
+
+def save_education(content):
+    with open("education.txt", 'a') as f:
+        f.write(content)
+        print("最低学历已录入...")
+
+def save_experience(content):
+    with open("experience.txt", 'a') as f:
+        f.write(content)
+        print("工作经验已录入...")
 
 def save_demand(content):
     with open("demand.txt", 'a') as f:
@@ -99,8 +114,8 @@ def main(page):
     url = "http://sou.zhaopin.com/jobs/searchresult.ashx?jl=%E5%85%A8%E5%9B%BD&kw=python&sm=0&p={}".format(page)
     html = get_page(url)
     docs = parse_index_page(html)
-    print("3秒后继续...")
-    time.sleep(3)
+    print("休息后继续...")
+    time.sleep(random.randint(1,5))
     for doc in docs:
         html = get_page(doc)
         job_infors = parse_detail_page(html)
@@ -110,8 +125,11 @@ def main(page):
             save_location(job_infor['地点'])
             save_salary(job_infor['职位月薪'])
             save_treatment(job_infor['待遇'])
-            print("休息3秒...")
-            time.sleep(3)
+            save_education(job_infor['最低学历'])
+            save_catrgory(job_infor['职位类别'])
+            save_experience(job_infor['工作经验'])
+            print("休息...")
+            time.sleep(random.randint(1,5))
 
 
 if __name__ == '__main__':
@@ -121,4 +139,3 @@ if __name__ == '__main__':
         print("\n采集完成!")
     except:
         print("可能已经采集完毕。")
-    #main([page for page in range(1,100)])
